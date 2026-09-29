@@ -1,0 +1,6 @@
+{
+  "name": "Planet Luxury Guest Houses",
+  "description": "Premium luxury guest house and hotel in Assosa, Benishangul-Gumuz, Ethiopia featuring elegant rooms, fine dining, conference facilities, and authentic hospitality.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
