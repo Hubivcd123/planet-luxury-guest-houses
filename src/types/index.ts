@@ -147,4 +147,7 @@ export interface HotelInfo {
   checkOutTime: string;
   googleMapsEmbedUrl: string;
   googleMapsDirectionsUrl: string;
+  heroImageUrl?: string;
+  aboutImageUrl?: string;
+  diningImageUrl?: string;
 }

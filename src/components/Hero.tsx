@@ -4,7 +4,14 @@ import { BookingBar } from './BookingBar';
 import { Sparkles, ArrowRight, ShieldCheck, Award } from 'lucide-react';
 
 export const Hero: React.FC = () => {
-  const { t, openBookingModal } = useHotel();
+  const { t, openBookingModal, hotelInfo, gallery } = useHotel();
+
+  // Dynamic website hero image: pulls from hotelInfo or active exterior gallery photo
+  const heroBgImage = hotelInfo.heroImageUrl
+    || gallery.find(g => g.featured && (g.category === 'exterior' || g.category === 'outdoor'))?.imageUrl
+    || gallery.find(g => g.category === 'exterior')?.imageUrl
+    || gallery[0]?.imageUrl
+    || '/src/assets/images/hero_planet_luxury_1790712166933.jpg';
 
   const handleExploreRooms = () => {
     const el = document.querySelector('#rooms');
@@ -18,7 +25,8 @@ export const Hero: React.FC = () => {
       {/* Background Photography with Measured Luxury Scrim */}
       <div className="absolute inset-0 z-0">
         <img
-          src="/src/assets/images/hero_planet_luxury_1790712166933.jpg"
+          key={heroBgImage}
+          src={heroBgImage}
           alt="Planet Luxury Guest Houses Assosa Ethiopia"
           referrerPolicy="no-referrer"
           className="w-full h-full object-cover object-center scale-[1.02] transform transition-transform duration-1000"

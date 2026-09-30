@@ -83,11 +83,12 @@ export const GallerySection: React.FC = () => {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {filteredItems.map((item, idx) => (
             <div
-              key={item.id}
+              key={`${item.id}-${item.imageUrl.slice(-25)}`}
               onClick={() => openLightbox(idx)}
               className="group relative h-72 rounded-2xl overflow-hidden cursor-pointer shadow-sm hover:shadow-xl transition-all duration-300 bg-stone-900"
             >
               <img
+                key={item.imageUrl}
                 src={item.imageUrl}
                 alt={getLoc(item.title)}
                 referrerPolicy="no-referrer"
@@ -143,6 +144,7 @@ export const GallerySection: React.FC = () => {
             onClick={e => e.stopPropagation()}
           >
             <img
+              key={filteredItems[lightboxIndex].imageUrl}
               src={filteredItems[lightboxIndex].imageUrl}
               alt={getLoc(filteredItems[lightboxIndex].title)}
               referrerPolicy="no-referrer"

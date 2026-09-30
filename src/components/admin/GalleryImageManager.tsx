@@ -44,6 +44,10 @@ export const GalleryImageManager: React.FC = () => {
     reorderGalleryItems,
     getLoc,
     language,
+    hotelInfo,
+    setWebsiteHeroImage,
+    setWebsiteAboutImage,
+    setWebsiteDiningImage,
   } = useHotel();
 
   // Multi-upload staging
@@ -187,8 +191,8 @@ export const GalleryImageManager: React.FC = () => {
     if (!replacingItem) return;
     replaceGalleryItem(replacingItem.id, newUrl);
     setReplacingItem(null);
-    setUploadSuccess('Gallery picture replaced successfully and updated on all pages!');
-    setTimeout(() => setUploadSuccess(null), 3000);
+    setUploadSuccess('Gallery picture replaced successfully! Live updates are now active across the website (Gallery visual tour, Hero banner, and matching sections).');
+    setTimeout(() => setUploadSuccess(null), 4000);
   };
 
   // Delete confirm
@@ -363,6 +367,9 @@ export const GalleryImageManager: React.FC = () => {
         {filteredGallery.map((item, index) => {
           const title = getLoc(item.title);
           const isFeatured = item.featured;
+          const isHero = hotelInfo.heroImageUrl === item.imageUrl || (item.category === 'exterior' && isFeatured);
+          const isAbout = hotelInfo.aboutImageUrl === item.imageUrl;
+          const isDining = hotelInfo.diningImageUrl === item.imageUrl;
 
           return (
             <div
@@ -435,20 +442,93 @@ export const GalleryImageManager: React.FC = () => {
               </div>
 
               {/* Card Info */}
-              <div className="p-4 flex-1 flex flex-col justify-between">
+              <div className="p-4 flex-1 flex flex-col justify-between space-y-3">
                 <div>
-                  <h5 className="font-serif-luxury font-bold text-stone-900 text-base mb-1 truncate">
-                    {title}
-                  </h5>
+                  <div className="flex items-start justify-between gap-2">
+                    <h5 className="font-serif-luxury font-bold text-stone-900 text-base mb-1 truncate flex-1">
+                      {title}
+                    </h5>
+                  </div>
+
+                  {/* Active Website Presence Tags */}
+                  {(isHero || isAbout || isDining) && (
+                    <div className="flex flex-wrap gap-1 mb-2">
+                      {isHero && (
+                        <span className="px-2 py-0.5 bg-amber-100 text-[#0F2D24] text-[10px] font-bold rounded flex items-center gap-1 border border-amber-300">
+                          🏠 Live Hero Banner
+                        </span>
+                      )}
+                      {isAbout && (
+                        <span className="px-2 py-0.5 bg-emerald-100 text-emerald-900 text-[10px] font-bold rounded flex items-center gap-1 border border-emerald-300">
+                          ℹ️ Live About Section
+                        </span>
+                      )}
+                      {isDining && (
+                        <span className="px-2 py-0.5 bg-amber-50 text-amber-900 text-[10px] font-bold rounded flex items-center gap-1 border border-amber-300">
+                          🍽️ Live Dining Section
+                        </span>
+                      )}
+                    </div>
+                  )}
+
                   {item.description && (
-                    <p className="text-xs text-stone-500 line-clamp-1 mb-3">
+                    <p className="text-xs text-stone-500 line-clamp-1">
                       {getLoc(item.description)}
                     </p>
                   )}
                 </div>
 
+                {/* Direct Website Placement Quick Controls */}
+                <div className="pt-2 border-t border-stone-100 flex items-center justify-between text-[11px] text-stone-500">
+                  <span className="font-medium text-stone-400">Set Live Banner:</span>
+                  <div className="flex items-center gap-1">
+                    {!isHero && (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setWebsiteHeroImage(item.imageUrl);
+                          setUploadSuccess(`"${title}" is now the Live Homepage Hero Banner!`);
+                          setTimeout(() => setUploadSuccess(null), 3000);
+                        }}
+                        className="px-2 py-0.5 rounded bg-stone-100 hover:bg-[#0F2D24] hover:text-amber-300 text-stone-700 transition-colors text-[10px] font-semibold cursor-pointer"
+                        title="Display this photo as the main Hero banner on the website"
+                      >
+                        + Hero
+                      </button>
+                    )}
+                    {!isAbout && (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setWebsiteAboutImage(item.imageUrl);
+                          setUploadSuccess(`"${title}" is now the Live About Section photo!`);
+                          setTimeout(() => setUploadSuccess(null), 3000);
+                        }}
+                        className="px-2 py-0.5 rounded bg-stone-100 hover:bg-[#0F2D24] hover:text-emerald-300 text-stone-700 transition-colors text-[10px] font-semibold cursor-pointer"
+                        title="Display this photo in the About story section"
+                      >
+                        + About
+                      </button>
+                    )}
+                    {!isDining && (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setWebsiteDiningImage(item.imageUrl);
+                          setUploadSuccess(`"${title}" is now the Live Dining showcase photo!`);
+                          setTimeout(() => setUploadSuccess(null), 3000);
+                        }}
+                        className="px-2 py-0.5 rounded bg-stone-100 hover:bg-[#0F2D24] hover:text-amber-200 text-stone-700 transition-colors text-[10px] font-semibold cursor-pointer"
+                        title="Display this photo in the Dining section spotlight"
+                      >
+                        + Dining
+                      </button>
+                    )}
+                  </div>
+                </div>
+
                 {/* Action Buttons: [EDIT] [REPLACE] [DELETE] */}
-                <div className="pt-3 border-t border-stone-100 grid grid-cols-3 gap-1.5 text-xs">
+                <div className="pt-2 border-t border-stone-100 grid grid-cols-3 gap-1.5 text-xs">
                   <button
                     type="button"
                     onClick={() => handleOpenEdit(item)}

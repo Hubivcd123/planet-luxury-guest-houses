@@ -3,7 +3,14 @@ import { useHotel } from '../context/HotelContext';
 import { Check, ShieldCheck, MapPin, Sparkles } from 'lucide-react';
 
 export const AboutSection: React.FC = () => {
-  const { t, openBookingModal } = useHotel();
+  const { t, openBookingModal, hotelInfo, gallery } = useHotel();
+
+  // Dynamic About image: pulls from hotelInfo or active reception/facilities gallery photo
+  const aboutImage = hotelInfo.aboutImageUrl
+    || gallery.find(g => g.category === 'reception')?.imageUrl
+    || gallery.find(g => g.category === 'facilities')?.imageUrl
+    || gallery.find(g => g.category === 'outdoor')?.imageUrl
+    || '/src/assets/images/facilities_lounge_1790712213187.jpg';
 
   return (
     <section id="about" className="py-20 sm:py-28 bg-[#FBFBFA]">
@@ -13,7 +20,8 @@ export const AboutSection: React.FC = () => {
           <div className="relative">
             <div className="relative z-10 rounded-2xl overflow-hidden shadow-2xl border-4 border-white bg-stone-900">
               <img
-                src="/src/assets/images/facilities_lounge_1790712213187.jpg"
+                key={aboutImage}
+                src={aboutImage}
                 alt="Planet Luxury Lounge & Hospitality"
                 referrerPolicy="no-referrer"
                 className="w-full h-[400px] sm:h-[480px] object-cover object-center"

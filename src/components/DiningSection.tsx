@@ -3,8 +3,13 @@ import { useHotel } from '../context/HotelContext';
 import { Sparkles, Utensils, Coffee, CheckCircle } from 'lucide-react';
 
 export const DiningSection: React.FC = () => {
-  const { diningItems, t, getLoc, openBookingModal } = useHotel();
+  const { diningItems, t, getLoc, openBookingModal, hotelInfo, gallery } = useHotel();
   const [activeCategory, setActiveCategory] = useState<string>('all');
+
+  // Dynamic Dining showcase image: pulls from hotelInfo or active restaurant/dining gallery photo
+  const diningBannerImage = hotelInfo.diningImageUrl
+    || gallery.find(g => g.category === 'restaurant' || g.category === 'dining')?.imageUrl
+    || '/src/assets/images/dining_restaurant_1790712202379.jpg';
 
   const categories = [
     { id: 'all', label: t.dining.allMenu },
@@ -39,7 +44,8 @@ export const DiningSection: React.FC = () => {
           <div className="grid grid-cols-1 lg:grid-cols-2">
             <div className="relative min-h-[300px] lg:min-h-full overflow-hidden bg-stone-900">
               <img
-                src="/src/assets/images/dining_restaurant_1790712202379.jpg"
+                key={diningBannerImage}
+                src={diningBannerImage}
                 alt="Ethiopian Coffee Ceremony & Dining"
                 referrerPolicy="no-referrer"
                 className="w-full h-full object-cover object-center"

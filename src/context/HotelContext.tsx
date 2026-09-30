@@ -87,6 +87,9 @@ interface HotelContextType {
   replaceGalleryItem: (id: string, newUrl: string) => void;
   deleteGalleryItem: (id: string) => void;
   reorderGalleryItems: (fromIndex: number, toIndex: number) => void;
+  setWebsiteHeroImage: (imageUrl: string) => void;
+  setWebsiteAboutImage: (imageUrl: string) => void;
+  setWebsiteDiningImage: (imageUrl: string) => void;
 
   // Testimonials
   testimonials: Testimonial[];
@@ -306,6 +309,11 @@ export const HotelProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   };
 
   const replaceRoomImage = (roomId: string, imageId: string, newUrl: string) => {
+    let oldUrl: string | undefined;
+    const targetRoom = rooms.find(r => r.id === roomId);
+    const targetImg = targetRoom?.images?.find(i => i.id === imageId);
+    oldUrl = targetImg?.url || targetRoom?.imageUrl;
+
     setRooms(prev => prev.map(r => {
       if (r.id !== roomId) return r;
       let isTargetMain = false;
@@ -322,6 +330,19 @@ export const HotelProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         imageUrl: isTargetMain ? newUrl : r.imageUrl,
       };
     }));
+
+    // If this image was used in the gallery or website banners, update them synchronously
+    if (oldUrl) {
+      setGallery(prev => prev.map(g => g.imageUrl === oldUrl ? { ...g, imageUrl: newUrl } : g));
+      setHotelInfo(prev => {
+        let changed = false;
+        const updated = { ...prev };
+        if (prev.heroImageUrl === oldUrl) { updated.heroImageUrl = newUrl; changed = true; }
+        if (prev.aboutImageUrl === oldUrl) { updated.aboutImageUrl = newUrl; changed = true; }
+        if (prev.diningImageUrl === oldUrl) { updated.diningImageUrl = newUrl; changed = true; }
+        return changed ? updated : prev;
+      });
+    }
   };
 
   const setRoomMainImage = (roomId: string, imageId: string) => {
@@ -541,7 +562,71 @@ export const HotelProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   const addMultipleGalleryItems = (items: GalleryItem[]) => setGallery(prev => [...items, ...prev]);
   const updateGalleryItem = (updated: GalleryItem) => setGallery(prev => prev.map(g => g.id === updated.id ? updated : g));
   const replaceGalleryItem = (id: string, newUrl: string) => {
+    const targetItem = gallery.find(g => g.id === id);
+    const oldUrl = targetItem?.imageUrl;
+
+    // 1. Update Gallery
     setGallery(prev => prev.map(g => g.id === id ? { ...g, imageUrl: newUrl } : g));
+
+    if (!oldUrl) return;
+
+    // 2. Propagate to HotelInfo website presentation slots
+    setHotelInfo(prev => {
+      let changed = false;
+      const updated = { ...prev };
+      // Check if this picture was the hero banner or primary exterior
+      if (prev.heroImageUrl === oldUrl || (targetItem?.category === 'exterior' && targetItem?.featured)) {
+        updated.heroImageUrl = newUrl;
+        changed = true;
+      }
+      // Check if this picture was the about reception/lounge
+      if (prev.aboutImageUrl === oldUrl || (targetItem?.category === 'reception')) {
+        updated.aboutImageUrl = newUrl;
+        changed = true;
+      }
+      // Check if this picture was the dining showcase
+      if (prev.diningImageUrl === oldUrl || (targetItem?.category === 'restaurant')) {
+        updated.diningImageUrl = newUrl;
+        changed = true;
+      }
+      return changed ? updated : prev;
+    });
+
+    // 3. Propagate to Rooms where oldUrl was used
+    setRooms(prevRooms => prevRooms.map(room => {
+      const isRoomMain = room.imageUrl === oldUrl;
+      const hasSubMatch = room.images?.some(img => img.url === oldUrl);
+
+      if (!isRoomMain && !hasSubMatch) return room;
+
+      const updatedImages = (room.images || []).map(img =>
+        img.url === oldUrl ? { ...img, url: newUrl } : img
+      );
+
+      return {
+        ...room,
+        imageUrl: isRoomMain ? newUrl : room.imageUrl,
+        images: updatedImages,
+      };
+    }));
+
+    // 4. Propagate to Special Offers where oldUrl was used
+    setOffers(prev => prev.map(o => o.imageUrl === oldUrl ? { ...o, imageUrl: newUrl } : o));
+
+    // 5. Propagate to Dining Items where oldUrl was used
+    setDiningItems(prev => prev.map(d => d.imageUrl === oldUrl ? { ...d, imageUrl: newUrl } : d));
+  };
+
+  const setWebsiteHeroImage = (imageUrl: string) => {
+    setHotelInfo(prev => ({ ...prev, heroImageUrl: imageUrl }));
+  };
+
+  const setWebsiteAboutImage = (imageUrl: string) => {
+    setHotelInfo(prev => ({ ...prev, aboutImageUrl: imageUrl }));
+  };
+
+  const setWebsiteDiningImage = (imageUrl: string) => {
+    setHotelInfo(prev => ({ ...prev, diningImageUrl: imageUrl }));
   };
   const deleteGalleryItem = (id: string) => setGallery(prev => prev.filter(g => g.id !== id));
   const reorderGalleryItems = (fromIndex: number, toIndex: number) => {
@@ -682,6 +767,9 @@ export const HotelProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         replaceGalleryItem,
         deleteGalleryItem,
         reorderGalleryItems,
+        setWebsiteHeroImage,
+        setWebsiteAboutImage,
+        setWebsiteDiningImage,
         testimonials,
         addTestimonial,
         updateTestimonial,

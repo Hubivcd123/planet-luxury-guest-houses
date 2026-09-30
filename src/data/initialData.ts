@@ -790,6 +790,9 @@ export const INITIAL_HOTEL_INFO: HotelInfo = {
   checkOutTime: '12:00 PM (12:00)',
   googleMapsEmbedUrl: 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3928.7905872895627!2d34.526!3d10.063!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x165b4c1000000001%3A0x1000000000000000!2sAssosa%2C%20Ethiopia!5e0!3m2!1sen!2set!4v1700000000000!5m2!1sen!2set',
   googleMapsDirectionsUrl: 'https://maps.google.com/?q=Assosa,+Benishangul-Gumuz,+Ethiopia',
+  heroImageUrl: '/src/assets/images/hero_planet_luxury_1790712166933.jpg',
+  aboutImageUrl: '/src/assets/images/facilities_lounge_1790712213187.jpg',
+  diningImageUrl: '/src/assets/images/dining_restaurant_1790712202379.jpg',
 };
 
 export const INITIAL_BOOKINGS: Booking[] = [
